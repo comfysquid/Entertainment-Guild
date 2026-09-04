@@ -1,0 +1,23 @@
+# Assignment-provided files
+Client Documents and Files/
+
+# Dependencies and generated output
+node_modules/
+frontend/node_modules/
+frontend/build/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor and operating system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
