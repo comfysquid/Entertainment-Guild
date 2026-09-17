@@ -1,0 +1,58 @@
+const catalogueItems = [
+  {
+    id: 1,
+    title: 'The Midnight Library',
+    creator: 'Matt Haig',
+    category: 'Books',
+    format: 'Paperback',
+    price: 18.99,
+    availability: 'In stock',
+  },
+  {
+    id: 2,
+    title: 'Dune',
+    creator: 'Denis Villeneuve',
+    category: 'Movies',
+    format: 'Blu-ray',
+    price: 24.99,
+    availability: 'In stock',
+  },
+  {
+    id: 3,
+    title: 'Stardew Valley',
+    creator: 'ConcernedApe',
+    category: 'Games',
+    format: 'Nintendo Switch',
+    price: 39.95,
+    availability: 'Low stock',
+  },
+  {
+    id: 4,
+    title: 'Piranesi',
+    creator: 'Susanna Clarke',
+    category: 'Books',
+    format: 'Hardcover',
+    price: 29.99,
+    availability: 'In stock',
+  },
+  {
+    id: 5,
+    title: 'Spider-Man: Across the Spider-Verse',
+    creator: 'Joaquim Dos Santos',
+    category: 'Movies',
+    format: '4K UHD',
+    price: 34.99,
+    availability: 'In stock',
+  },
+  {
+    id: 6,
+    title: 'Hades',
+    creator: 'Supergiant Games',
+    category: 'Games',
+    format: 'PlayStation 5',
+    price: 44.95,
+    availability: 'Low stock',
+  },
+];
+
+export default catalogueItems;

@@ -5,3 +5,12 @@ body {
 .app {
   min-height: 100vh;
 }
+
+.catalogue-hero {
+  background: linear-gradient(135deg, #e8f1ff 0%, #fff8ed 100%);
+}
+
+.hero-highlight {
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(13, 110, 253, 0.15);
+}
