@@ -1,15 +1,12 @@
 import React from 'react';
 import '../AppTheme.css';
+import Footer from '../components/Footer';
+import Navbar from '../components/Navbar';
 
 function HomePage() {
   return (
     <div className="app">
-      <header className="navbar navbar-dark bg-dark">
-        <div className="container">
-          <a className="navbar-brand" href="/">Entertainment Guild</a>
-          <span className="navbar-text">Online Store</span>
-        </div>
-      </header>
+      <Navbar />
 
       <main className="container py-5">
         <div className="text-center">
@@ -19,9 +16,7 @@ function HomePage() {
         </div>
       </main>
 
-      <footer className="container py-4 border-top text-muted">
-        <small>Entertainment Guild frontend prototype</small>
-      </footer>
+      <Footer />
     </div>
   );
 }
