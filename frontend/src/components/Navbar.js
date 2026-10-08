@@ -1,13 +1,23 @@
 import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
 function Navbar() {
+  const navigate = useNavigate();
+
+  function submitSearch(event) {
+    event.preventDefault();
+    const query = new FormData(event.currentTarget).get('q')?.toString().trim();
+    navigate(query ? `/search?q=${encodeURIComponent(query)}` : '/search');
+  }
+
   return (
     <header className="navbar navbar-expand-lg navbar-dark bg-dark">
       <div className="container">
-        <a className="navbar-brand fw-semibold" href="/">
+        <Link className="navbar-brand fw-semibold" to="/">
           Entertainment Guild
-        </a>
+        </Link>
 
+        {/* Bootstrap hamburger menu for smaller screens. */}
         <button
           className="navbar-toggler"
           type="button"
@@ -21,19 +31,21 @@ function Navbar() {
         </button>
 
         <div className="collapse navbar-collapse" id="main-navigation">
+          {/* Main storefront destinations. */}
           <nav className="navbar-nav me-auto" aria-label="Primary navigation">
-            <a className="nav-link active" aria-current="page" href="/">
+            <Link className="nav-link active" aria-current="page" to="/">
               Home
-            </a>
-            <a className="nav-link" href="/search">
+            </Link>
+            <Link className="nav-link" to="/search">
               Browse items
-            </a>
+            </Link>
             <a className="nav-link" href="/cart">
               Cart
             </a>
           </nav>
 
-          <form className="d-flex" role="search" action="/search">
+          {/* Send the search term to the live catalogue page as a query parameter. */}
+          <form className="d-flex" onSubmit={submitSearch} role="search">
             <label className="visually-hidden" htmlFor="site-search">
               Search items
             </label>

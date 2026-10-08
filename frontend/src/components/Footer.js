@@ -3,6 +3,7 @@ import React from 'react';
 function Footer() {
   return (
     <footer className="border-top bg-white mt-auto">
+      {/* Standard nav bar, adjusts to screen sizes. */}
       <div className="container py-4 d-flex flex-column flex-md-row justify-content-between gap-3">
         <div>
           <p className="mb-1 fw-semibold">Entertainment Guild</p>
