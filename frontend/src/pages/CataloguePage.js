@@ -6,11 +6,15 @@ import Navbar from '../components/Navbar';
 import ProductCard from '../components/ProductCard';
 import { fetchCatalogueItems } from '../data/catalogue';
 
+// Hard-coded page size; keeps grid format
 const PAGE_SIZE = 12;
 const CATEGORIES = ['All', 'Books', 'Movies', 'Games'];
 
 function CataloguePage() {
+  // Read/write ?q=... in the address bar so searches can be bookmarked
   const [searchParams, setSearchParams] = useSearchParams();
+
+  // Store the full API result separately from the current search
   const [catalogueItems, setCatalogueItems] = useState([]);
   const [searchTerm, setSearchTerm] = useState(searchParams.get('q') || '');
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -20,14 +24,16 @@ function CataloguePage() {
   const [error, setError] = useState('');
   const [retryCount, setRetryCount] = useState(0);
 
-  // Load the catalogue once; search and filters work against the joined records in memory.
+  // Load the catalogue once; typing and changing dropdowns then filter these records locally.
   useEffect(() => {
+    // For if page is closed before request finishes.
     let isCurrent = true;
 
     async function loadCatalogue() {
       setIsLoading(true);
       setError('');
       try {
+        // Helper func, fetches Product, Stocktake, Source, and Genre, then joins their rows.
         const items = await fetchCatalogueItems();
         if (isCurrent) setCatalogueItems(items);
       } catch (requestError) {
@@ -43,12 +49,13 @@ function CataloguePage() {
     };
   }, [retryCount]);
 
-  // Keep the search box in sync if a search term comes from the navbar URL.
+  // Navbar search bar can open /search?q=...; copy that URL value into the search box.
   useEffect(() => {
     setSearchTerm(searchParams.get('q') || '');
     setCurrentPage(1);
   }, [searchParams]);
 
+  // Build the format dropdown from the actual catalogue, rather than hard-coding formats.
   const formats = useMemo(
     () => ['All', ...new Set(catalogueItems.map((item) => item.format).filter(Boolean))].sort((a, b) => {
       if (a === 'All') return -1;
@@ -58,6 +65,7 @@ function CataloguePage() {
     [catalogueItems],
   );
 
+  // Apply all three filters together: text can match title/creator/category/format.
   const filteredItems = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
     return catalogueItems.filter((item) => {
@@ -68,9 +76,12 @@ function CataloguePage() {
     });
   }, [catalogueItems, searchTerm, selectedCategory, selectedFormat]);
 
+  // Round up so even a partly-filled final page gets its own page number.
   const pageCount = Math.ceil(filteredItems.length / PAGE_SIZE);
+  // `slice` takes only the rows belonging to the current page (12 at a time).
   const visibleItems = filteredItems.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
+  // These functions set the state for the dropdowns and search box, and reset to page 1 when a filter changes.
   function updateCategory(category) {
     setSelectedCategory(category);
     setCurrentPage(1);
@@ -84,11 +95,13 @@ function CataloguePage() {
   function updateSearchTerm(value) {
     setSearchTerm(value);
     setCurrentPage(1);
+    // AVOIDS ADDING MULTIPLE ENTRIES TO BROWSER HISTORY.
     const query = value.trim();
     setSearchParams(query ? { q: query } : {}, { replace: true });
   }
 
   function clearFilters() {
+    // Reset both the visible controls and the URL back to the unfiltered catalogue.
     setSearchTerm('');
     setSearchParams({});
     setSelectedCategory('All');
@@ -148,6 +161,7 @@ function CataloguePage() {
             </div>
           </section>
 
+          {/* Render one state at a time so loading/errors don't look like an empty result. */}
           {isLoading ? (
             <p className="text-muted py-4" role="status">Loading catalogue…</p>
           ) : error ? (
@@ -166,6 +180,7 @@ function CataloguePage() {
             </div>
           ) : (
             <>
+              {/* The count describes all matches; the grid below only shows this page's slice. */}
               <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
                 <p className="catalogue-result-count mb-0" aria-live="polite">
                   <strong>{filteredItems.length}</strong> {filteredItems.length === 1 ? 'item' : 'items'} found
@@ -181,6 +196,7 @@ function CataloguePage() {
                 ))}
               </div>
 
+              {/* Hide navigation when everything fits on one page. */}
               {pageCount > 1 && (
                 <nav aria-label="Catalogue pages" className="mt-4">
                   <ul className="pagination justify-content-center">
