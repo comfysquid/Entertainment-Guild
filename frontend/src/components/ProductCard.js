@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 function ProductCard({ item }) {
   // Use color as a quick visual cue, while still keeping the stock text visible.
@@ -19,9 +20,9 @@ function ProductCard({ item }) {
         {/* price and details link to the bottom so cards line up in the grid. */}
         <div className="mt-auto d-flex justify-content-between align-items-center">
           <span className="fs-5 fw-semibold">${item.price.toFixed(2)}</span>
-          <a className="btn btn-outline-primary btn-sm" href={`/products/${item.id}`}>
+          <Link className="btn btn-outline-primary btn-sm" to={`/products/${item.id}`}>
             View details
-          </a>
+          </Link>
         </div>
       </div>
     </article>

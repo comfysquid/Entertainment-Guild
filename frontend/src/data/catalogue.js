@@ -91,3 +91,46 @@ async function fetchFeaturedItem(stockItemId) {
 export async function fetchFeaturedCatalogueItems() {
   return Promise.all(FEATURED_STOCK_ITEM_IDS.map(fetchFeaturedItem));
 }
+
+// A details URL uses the Stocktake ID because price, format, and quantity belong to that row.
+export async function fetchCatalogueItemDetails(stockItemId) {
+  const stockItem = await fetchRecord('Stocktake', stockItemId);
+  const [product, source] = await Promise.all([
+    fetchRecord('Product', stockItem.ProductId),
+    fetchRecord('Source', stockItem.SourceId),
+  ]);
+  const genre = await fetchRecord('Genre', product.Genre);
+
+  // Each category has its own subgenre table in the database.
+  const subgenreTable = {
+    Books: 'BookGenre',
+    Movies: 'MovieGenre',
+    Games: 'GameGenre',
+  }[genre.Name];
+  const subgenreId = product.subGenre ?? product.SubGenre;
+  let subgenre = null;
+
+  if (subgenreTable && subgenreId) {
+    try {
+      subgenre = await fetchRecord(subgenreTable, subgenreId);
+    } catch (error) {
+      // Some legacy records have a missing subgenre link; the rest of the details still work.
+    }
+  }
+
+  const quantity = Number(stockItem.Quantity) || 0;
+  return {
+    id: stockItem.ItemId,
+    productId: product.ID,
+    title: product.Name,
+    creator: product.Author || 'Unknown creator',
+    description: product.Description || 'No description is available.',
+    category: genre.Name || 'Other',
+    subgenre: subgenre?.Name || 'Not specified',
+    published: product.Published || null,
+    format: getSourceName(source),
+    price: Number(stockItem.Price) || 0,
+    availability: quantity > 0 ? 'In stock' : 'Out of stock',
+    quantity,
+  };
+}

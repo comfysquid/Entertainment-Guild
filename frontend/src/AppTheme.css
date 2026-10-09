@@ -31,6 +31,24 @@ body {
   color: #526071;
 }
 
+.product-details-card {
+  background-color: #fff;
+  border: 1px solid #e6eaf0;
+  border-radius: 1rem;
+  box-shadow: 0 0.5rem 1.5rem rgba(31, 45, 61, 0.06);
+}
+
+.product-description {
+  line-height: 1.75;
+  white-space: pre-line;
+}
+
+.product-purchase-panel {
+  background-color: #f8f9fa;
+  border: 1px solid #e6eaf0;
+  border-radius: 0.8rem;
+}
+
 .card.shadow-sm {
   border: 1px solid #e6eaf0;
   border-radius: 0.9rem;
