@@ -1,136 +1,124 @@
+// AI use: this file was simplified with help from Claude (Anthropic).
 import axios from 'axios';
 
-// Keep the API URL in one place so it is easy to change between local and deployed setups.
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3001';
-const API_PATH = `${API_BASE_URL}/api/inft3050`;
+// The base address of the INFT3050 API running in Docker.
+const API_URL = 'http://localhost:3001/api/inft3050';
 
-// Manually chosen featured catalogue items: one book, one movie, and one game.
-const FEATURED_STOCK_ITEM_IDS = [31, 248, 457];
+// The Stocktake IDs of the items shown on the homepage (one book, one movie, one game).
+const FEATURED_ITEM_IDS = [31, 248, 457];
 
-// Ask for one database row by ID instead of downloading every row for the homepage.
-async function fetchRecord(table, id) {
-  const response = await axios.get(`${API_PATH}/${table}/${id}`);
+// Gets a single row from a table, e.g. getRow('Product', 19).
+async function getRow(table, id) {
+  const response = await axios.get(API_URL + '/' + table + '/' + id);
   return response.data;
 }
 
-// The browse page needs the full set; each table is small enough for one request today.
-async function fetchTable(table) {
-  const response = await axios.get(`${API_PATH}/${table}`, {
-    params: { limit: 1000 },
-  });
+// Gets every row from a table. The API only returns a few rows unless we ask for more.
+async function getAllRows(table) {
+  const response = await axios.get(API_URL + '/' + table, { params: { limit: 1000 } });
   return response.data.list;
 }
 
-// SQL/API versions have used different casing for this column; accept either one.
-function getSourceName(source) {
-  return source.Source_name || source.SourceName || 'Format not specified';
-}
+// The data for one item is spread across 4 tables:
+//   Stocktake = price and quantity, Product = title and author,
+//   Source = format (e.g. DVD), Genre = category (e.g. Books).
+// This function combines them into one simple object for the page to display.
+function makeItem(stockItem, product, source, genre) {
+  // Some products have no genre, so put them under 'Other'.
+  let category = 'Other';
+  if (genre) {
+    category = genre.Name;
+  }
 
-function getCategoryName(genreId, genres) {
-  const genre = genres.find((item) => item.genreID === genreId || item.GenreID === genreId);
-  return genre?.Name || 'Other';
-}
-
-// Build one browse item for every Stocktake row, joining in its product, source, and genre.
-export async function fetchCatalogueItems() {
-  const [products, stockItems, sources, genres] = await Promise.all([
-    fetchTable('Product'),
-    fetchTable('Stocktake'),
-    fetchTable('Source'),
-    fetchTable('Genre'),
-  ]);
-
-  const productsById = new Map(products.map((product) => [product.ID, product]));
-  const sourcesById = new Map(sources.map((source) => [source.sourceid || source.Sourceid, source]));
-
-  return stockItems.flatMap((stockItem) => {
-    const product = productsById.get(stockItem.ProductId);
-    const source = sourcesById.get(stockItem.SourceId);
-    if (!product || !source) return [];
-
-    const quantity = Number(stockItem.Quantity) || 0;
-    return [{
-      id: stockItem.ItemId,
-      productId: product.ID,
-      title: product.Name,
-      creator: product.Author || 'Unknown creator',
-      category: getCategoryName(product.Genre, genres),
-      format: getSourceName(source),
-      price: Number(stockItem.Price) || 0,
-      availability: quantity > 0 ? 'In stock' : 'Out of stock',
-      quantity,
-    }];
-  });
-}
-
-// The database splits a displayable item across Stocktake, Product, Source, and Genre.
-async function fetchFeaturedItem(stockItemId) {
-  const stockItem = await fetchRecord('Stocktake', stockItemId);
-  const [product, source] = await Promise.all([
-    fetchRecord('Product', stockItem.ProductId),
-    fetchRecord('Source', stockItem.SourceId),
-  ]);
-  const genre = await fetchRecord('Genre', product.Genre);
-
-  // Stocktake is the purchasable format, so use its price and quantity on the card.
-  const quantity = Number(stockItem.Quantity) || 0;
   return {
     id: stockItem.ItemId,
-    productId: product.ID,
     title: product.Name,
     creator: product.Author || 'Unknown creator',
-    category: genre.Name || 'Other',
-    format: getSourceName(source),
-    price: Number(stockItem.Price) || 0,
-    availability: quantity > 0 ? 'In stock' : 'Out of stock',
-    quantity,
+    category: category,
+    format: source.Source_name,
+    price: stockItem.Price,
+    quantity: stockItem.Quantity,
   };
 }
 
-// Only load the three manually selected items shown on the homepage.
-export async function fetchFeaturedCatalogueItems() {
-  return Promise.all(FEATURED_STOCK_ITEM_IDS.map(fetchFeaturedItem));
+// Used by the search page: loads every item in the catalogue.
+export async function fetchCatalogueItems() {
+  const stockItems = await getAllRows('Stocktake');
+  const products = await getAllRows('Product');
+  const sources = await getAllRows('Source');
+  const genres = await getAllRows('Genre');
+
+  const items = [];
+
+  for (const stockItem of stockItems) {
+    // Find the matching row in each of the other tables.
+    const product = products.find((p) => p.ID === stockItem.ProductId);
+    const source = sources.find((s) => s.sourceid === stockItem.SourceId);
+
+    // Skip any stock rows that point to a product or source that doesn't exist.
+    if (!product || !source) {
+      continue;
+    }
+
+    const genre = genres.find((g) => g.genreID === product.Genre);
+    items.push(makeItem(stockItem, product, source, genre));
+  }
+
+  return items;
 }
 
-// A details URL uses the Stocktake ID because price, format, and quantity belong to that row.
-export async function fetchCatalogueItemDetails(stockItemId) {
-  const stockItem = await fetchRecord('Stocktake', stockItemId);
-  const [product, source] = await Promise.all([
-    fetchRecord('Product', stockItem.ProductId),
-    fetchRecord('Source', stockItem.SourceId),
-  ]);
-  const genre = await fetchRecord('Genre', product.Genre);
+// Loads one item by its Stocktake ID.
+async function fetchItem(itemId) {
+  const stockItem = await getRow('Stocktake', itemId);
+  const product = await getRow('Product', stockItem.ProductId);
+  const source = await getRow('Source', stockItem.SourceId);
+  const genre = await getRow('Genre', product.Genre);
 
-  // Each category has its own subgenre table in the database.
-  const subgenreTable = {
-    Books: 'BookGenre',
-    Movies: 'MovieGenre',
-    Games: 'GameGenre',
-  }[genre.Name];
-  const subgenreId = product.subGenre ?? product.SubGenre;
-  let subgenre = null;
+  return makeItem(stockItem, product, source, genre);
+}
 
-  if (subgenreTable && subgenreId) {
+// Used by the homepage: loads only the three featured items.
+export async function fetchFeaturedCatalogueItems() {
+  const items = [];
+
+  for (const id of FEATURED_ITEM_IDS) {
+    const item = await fetchItem(id);
+    items.push(item);
+  }
+
+  return items;
+}
+
+// Used by the product details page: loads one item plus its description and subgenre.
+export async function fetchCatalogueItemDetails(itemId) {
+  const stockItem = await getRow('Stocktake', itemId);
+  const product = await getRow('Product', stockItem.ProductId);
+  const source = await getRow('Source', stockItem.SourceId);
+  const genre = await getRow('Genre', product.Genre);
+
+  const item = makeItem(stockItem, product, source, genre);
+  item.description = product.Description || 'No description is available.';
+  item.published = product.Published;
+
+  // Books, movies and games each have their own subgenre table.
+  let subgenreTable = '';
+  if (genre.Name === 'Books') {
+    subgenreTable = 'BookGenre';
+  } else if (genre.Name === 'Movies') {
+    subgenreTable = 'MovieGenre';
+  } else if (genre.Name === 'Games') {
+    subgenreTable = 'GameGenre';
+  }
+
+  item.subgenre = 'Not specified';
+  if (subgenreTable !== '' && product.subGenre) {
     try {
-      subgenre = await fetchRecord(subgenreTable, subgenreId);
+      const subgenre = await getRow(subgenreTable, product.subGenre);
+      item.subgenre = subgenre.Name;
     } catch (error) {
-      // Some legacy records have a missing subgenre link; the rest of the details still work.
+      // If the subgenre can't be found, just leave it as 'Not specified'.
     }
   }
 
-  const quantity = Number(stockItem.Quantity) || 0;
-  return {
-    id: stockItem.ItemId,
-    productId: product.ID,
-    title: product.Name,
-    creator: product.Author || 'Unknown creator',
-    description: product.Description || 'No description is available.',
-    category: genre.Name || 'Other',
-    subgenre: subgenre?.Name || 'Not specified',
-    published: product.Published || null,
-    format: getSourceName(source),
-    price: Number(stockItem.Price) || 0,
-    availability: quantity > 0 ? 'In stock' : 'Out of stock',
-    quantity,
-  };
+  return item;
 }

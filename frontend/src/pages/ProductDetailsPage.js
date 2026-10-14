@@ -1,3 +1,4 @@
+// AI use: this file was simplified with help from Claude (Anthropic).
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import '../AppTheme.css';
@@ -6,82 +7,94 @@ import Navbar from '../components/Navbar';
 import { fetchCatalogueItemDetails } from '../data/catalogue';
 
 function ProductDetailsPage() {
+  // Get the item ID from the URL, e.g. /products/31 gives itemId = '31'.
   const { itemId } = useParams();
+
   const [item, setItem] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
-  const [retryCount, setRetryCount] = useState(0);
 
+  // Load the item whenever the ID in the URL changes.
   useEffect(() => {
-    let isCurrent = true;
-
-    async function loadDetails() {
+    async function loadItem() {
       setIsLoading(true);
       setError('');
       try {
         const details = await fetchCatalogueItemDetails(itemId);
-        if (isCurrent) setItem(details);
-      } catch (requestError) {
-        if (isCurrent) setError('We could not load this item. It may no longer be available.');
-      } finally {
-        if (isCurrent) setIsLoading(false);
+        setItem(details);
+      } catch (err) {
+        setError('We could not load this item. It may no longer be available.');
       }
+      setIsLoading(false);
     }
 
-    loadDetails();
-    return () => {
-      isCurrent = false;
-    };
-  }, [itemId, retryCount]);
+    loadItem();
+  }, [itemId]);
+
+  // Decide what to show: loading message, error message, or the item details.
+  let pageContent = null;
+  if (isLoading) {
+    pageContent = <p className="text-muted" role="status">Loading item details…</p>;
+  } else if (error) {
+    pageContent = (
+      <div className="alert alert-danger" role="alert">
+        <p className="mb-2">{error}</p>
+        <button className="btn btn-outline-danger btn-sm" onClick={() => window.location.reload()} type="button">
+          Try again
+        </button>
+      </div>
+    );
+  } else if (item) {
+    // Text and colour for the stock line in the price box.
+    let stockText = 'Out of stock';
+    let stockColour = 'text-danger';
+    if (item.quantity > 0) {
+      stockText = item.quantity + ' available';
+      stockColour = 'text-success';
+    }
+
+    pageContent = (
+      <article className="product-details-card p-4 p-lg-5">
+        <div className="row g-4 g-lg-5">
+          {/* Left side: title, author and description */}
+          <div className="col-lg-8">
+            <div className="d-flex flex-wrap gap-2 mb-3">
+              <span className="badge text-bg-primary">{item.category}</span>
+              <span className="badge text-bg-light">{item.subgenre}</span>
+            </div>
+            <h1 className="display-6 fw-bold" id="product-heading">{item.title}</h1>
+            <p className="lead text-muted">{item.creator}</p>
+            <h2 className="h5 mt-4">About this item</h2>
+            <p className="product-description">{item.description}</p>
+            {/* Only show the year if the product has a published date. */}
+            {item.published && (
+              <p className="text-muted mb-0">
+                Published: {new Date(item.published).getUTCFullYear()}
+              </p>
+            )}
+          </div>
+
+          {/* Right side: format, price and stock */}
+          <aside className="col-lg-4" aria-label="Item availability and price">
+            <div className="product-purchase-panel p-4">
+              <p className="text-muted mb-1">Format</p>
+              <p className="fw-semibold">{item.format}</p>
+              <p className="display-6 fw-semibold mb-2">${item.price.toFixed(2)}</p>
+              <p className={stockColour}>{stockText}</p>
+              <p className="small text-muted mb-0">Purchasing and cart features will be added separately.</p>
+            </div>
+          </aside>
+        </div>
+      </article>
+    );
+  }
 
   return (
     <div className="app">
       <Navbar />
       <main className="container py-5" aria-labelledby="product-heading">
         <p className="mb-4"><Link to="/search">&larr; Back to catalogue</Link></p>
-
-        {isLoading ? (
-          <p className="text-muted" role="status">Loading item details…</p>
-        ) : error ? (
-          <div className="alert alert-danger" role="alert">
-            <p className="mb-2">{error}</p>
-            <button className="btn btn-outline-danger btn-sm" onClick={() => setRetryCount((count) => count + 1)} type="button">
-              Try again
-            </button>
-          </div>
-        ) : item ? (
-          <article className="product-details-card p-4 p-lg-5">
-            <div className="row g-4 g-lg-5">
-              <div className="col-lg-8">
-                <div className="d-flex flex-wrap gap-2 mb-3">
-                  <span className="badge text-bg-primary">{item.category}</span>
-                  <span className="badge text-bg-light">{item.subgenre}</span>
-                </div>
-                <h1 className="display-6 fw-bold" id="product-heading">{item.title}</h1>
-                <p className="lead text-muted">{item.creator}</p>
-                <h2 className="h5 mt-4">About this item</h2>
-                <p className="product-description">{item.description}</p>
-                {item.published && (
-                  <p className="text-muted mb-0">
-                    Published: {new Date(item.published).getUTCFullYear()}
-                  </p>
-                )}
-              </div>
-
-              <aside className="col-lg-4" aria-label="Item availability and price">
-                <div className="product-purchase-panel p-4">
-                  <p className="text-muted mb-1">Format</p>
-                  <p className="fw-semibold">{item.format}</p>
-                  <p className="display-6 fw-semibold mb-2">${item.price.toFixed(2)}</p>
-                  <p className={item.quantity > 0 ? 'text-success' : 'text-danger'}>
-                    {item.quantity > 0 ? `${item.quantity} available` : 'Out of stock'}
-                  </p>
-                  <p className="small text-muted mb-0">Purchasing and cart features will be added separately.</p>
-                </div>
-              </aside>
-            </div>
-          </article>
-        ) : null}
+        {pageContent}
       </main>
       <Footer />
     </div>

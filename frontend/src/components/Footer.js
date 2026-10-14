@@ -1,9 +1,11 @@
+// AI use: this file was simplified with help from Claude (Anthropic).
 import React from 'react';
 
+// The footer at the bottom of every page.
 function Footer() {
   return (
     <footer className="border-top bg-white mt-auto">
-      {/* Standard nav bar, adjusts to screen sizes. */}
+      {/* Stacks on small screens and sits in one row on bigger screens (flex-md-row). */}
       <div className="container py-4 d-flex flex-column flex-md-row justify-content-between gap-3">
         <div>
           <p className="mb-1 fw-semibold">Entertainment Guild</p>

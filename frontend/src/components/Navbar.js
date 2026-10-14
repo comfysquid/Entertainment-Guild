@@ -1,13 +1,22 @@
-import React from 'react';
+// AI use: this file was simplified with help from Claude (Anthropic).
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
+// The dark bar at the top of every page.
 function Navbar() {
   const navigate = useNavigate();
+  const [searchText, setSearchText] = useState('');
 
-  function submitSearch(event) {
-    event.preventDefault();
-    const query = new FormData(event.currentTarget).get('q')?.toString().trim();
-    navigate(query ? `/search?q=${encodeURIComponent(query)}` : '/search');
+  // When the search form is submitted, go to the search page with the text in the URL.
+  function handleSearch(event) {
+    event.preventDefault(); // stop the browser reloading the page
+
+    const text = searchText.trim();
+    if (text === '') {
+      navigate('/search');
+    } else {
+      navigate('/search?q=' + encodeURIComponent(text));
+    }
   }
 
   return (
@@ -17,7 +26,7 @@ function Navbar() {
           Entertainment Guild
         </Link>
 
-        {/* Bootstrap hamburger menu for smaller screens. */}
+        {/* Hamburger button that shows the menu on small screens (Bootstrap). */}
         <button
           className="navbar-toggler"
           type="button"
@@ -31,7 +40,7 @@ function Navbar() {
         </button>
 
         <div className="collapse navbar-collapse" id="main-navigation">
-          {/* Main storefront destinations. */}
+          {/* Page links */}
           <nav className="navbar-nav me-auto" aria-label="Primary navigation">
             <Link className="nav-link active" aria-current="page" to="/">
               Home
@@ -44,17 +53,18 @@ function Navbar() {
             </a>
           </nav>
 
-          {/* Send the search term to the live catalogue page as a query parameter. */}
-          <form className="d-flex" onSubmit={submitSearch} role="search">
+          {/* Search box */}
+          <form className="d-flex" onSubmit={handleSearch} role="search">
             <label className="visually-hidden" htmlFor="site-search">
               Search items
             </label>
             <input
               className="form-control me-2"
               id="site-search"
-              name="q"
               type="search"
               placeholder="Search items"
+              value={searchText}
+              onChange={(event) => setSearchText(event.target.value)}
             />
             <button className="btn btn-outline-light" type="submit">
               <i className="bi bi-search" aria-hidden="true" />

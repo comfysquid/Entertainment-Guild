@@ -1,3 +1,4 @@
+// AI use: this file was simplified with help from Claude (Anthropic).
 import React, { useEffect, useState } from 'react';
 import '../AppTheme.css';
 import Footer from '../components/Footer';
@@ -6,44 +7,59 @@ import ProductCard from '../components/ProductCard';
 import { fetchFeaturedCatalogueItems } from '../data/catalogue';
 
 function HomePage() {
-  // These values drive the small featured section and its loading/error messages.
   const [featuredItems, setFeaturedItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
-  const [retryCount, setRetryCount] = useState(0);
 
+  // Load the three featured items from the API when the page first opens.
   useEffect(() => {
-    // This flag stops a slow request updating state after the page has gone away.
-    let isCurrent = true;
-
-    async function loadCatalogue() {
-      setIsLoading(true);
-      setError('');
+    async function loadFeaturedItems() {
       try {
-        // Fetch only the featured items, not the entire catalogue.
         const items = await fetchFeaturedCatalogueItems();
-        if (isCurrent) setFeaturedItems(items);
-      } catch (requestError) {
-        if (isCurrent) {
-          setError('We could not load the catalogue. Check that the API is running and try again.');
-        }
-      } finally {
-        if (isCurrent) setIsLoading(false);
+        setFeaturedItems(items);
+      } catch (err) {
+        setError('We could not load the catalogue. Check that the API is running and try again.');
       }
+      setIsLoading(false);
     }
 
-    loadCatalogue();
-    return () => {
-      isCurrent = false;
-    };
-    // Bumping retryCount reruns this effect when the user presses "Try again".
-  }, [retryCount]);
+    loadFeaturedItems();
+  }, []);
+
+  // Work out what to show in the featured section: loading, error, the cards, or a message.
+  let featuredContent;
+  if (isLoading) {
+    featuredContent = <p className="text-muted" role="status">Loading catalogue…</p>;
+  } else if (error) {
+    featuredContent = (
+      <div className="alert alert-danger" role="alert">
+        <p className="mb-2">{error}</p>
+        {/* Reloading the page runs the API request again. */}
+        <button className="btn btn-outline-danger btn-sm" onClick={() => window.location.reload()} type="button">
+          Try again
+        </button>
+      </div>
+    );
+  } else if (featuredItems.length > 0) {
+    featuredContent = (
+      <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+        {featuredItems.map((item) => (
+          <div className="col" key={item.id}>
+            <ProductCard item={item} />
+          </div>
+        ))}
+      </div>
+    );
+  } else {
+    featuredContent = <div className="alert alert-info" role="status">There are no featured items available.</div>;
+  }
 
   return (
     <div className="app">
       <Navbar />
 
       <main>
+        {/* Big banner at the top of the homepage */}
         <section className="catalogue-hero py-5">
           <div className="container py-lg-4">
             <div className="row align-items-center g-4">
@@ -68,6 +84,7 @@ function HomePage() {
           </div>
         </section>
 
+        {/* Featured items section */}
         <section className="container py-5" id="featured-items" aria-labelledby="featured-heading">
           <div className="mb-4">
             <p className="text-uppercase small fw-semibold text-primary mb-1">Hand-picked</p>
@@ -75,31 +92,7 @@ function HomePage() {
             <p className="text-muted mt-2 mb-0">One featured book, movie, and game from our catalogue.</p>
           </div>
 
-          {/* Show one clear state at a time: loading, error, results, or empty. */}
-          {isLoading ? (
-            <p className="text-muted" role="status">Loading catalogue…</p>
-          ) : error ? (
-            <div className="alert alert-danger" role="alert">
-              <p className="mb-2">{error}</p>
-              <button
-                className="btn btn-outline-danger btn-sm"
-                onClick={() => setRetryCount((count) => count + 1)}
-                type="button"
-              >
-                Try again
-              </button>
-            </div>
-          ) : featuredItems.length > 0 ? (
-            <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
-              {featuredItems.map((item) => (
-                <div className="col" key={item.id}>
-                  <ProductCard item={item} />
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="alert alert-info" role="status">There are no featured items available.</div>
-          )}
+          {featuredContent}
         </section>
       </main>
 
