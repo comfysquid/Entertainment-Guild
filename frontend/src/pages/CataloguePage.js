@@ -121,11 +121,11 @@ function CataloguePage() {
     );
   } else if (filteredItems.length === 0) { // No results found
     results = (
-      <div className="catalogue-empty text-center py-5 px-3" role="status">
+      <div className="panel text-center py-5 px-3" role="status">
         <i className="bi bi-search display-5 text-muted" aria-hidden="true" />
         <h2 className="h4 mt-3">No matching items</h2>
         <p className="text-muted mb-3">Try another search or clear your filters.</p>
-        <button className="btn btn-outline-primary" onClick={clearFilters} type="button">Clear filters</button>
+        <button className="btn btn-outline-guild" onClick={clearFilters} type="button">Clear filters</button>
       </div>
     );
   } else { // Catalogue grid with pagination
@@ -133,7 +133,7 @@ function CataloguePage() {
       <>
         {/* Number of results and the current page */}
         <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-          <p className="catalogue-result-count mb-0" aria-live="polite">
+          <p className="text-body-secondary mb-0" aria-live="polite">
             <strong>{filteredItems.length}</strong> {filteredItems.length === 1 ? 'item' : 'items'} found
           </p>
           {totalPages > 1 && <small className="text-muted">Page {currentPage} of {totalPages}</small>}
@@ -185,19 +185,19 @@ function CataloguePage() {
   return (
     <div className="app">
       <Navbar />
-      <main className="catalogue-page" aria-labelledby="catalogue-heading">
+      <main aria-labelledby="catalogue-heading">
         {/* Page heading */}
-        <section className="catalogue-page-header">
+        <section className="page-banner">
           <div className="container py-5">
-            <p className="text-uppercase small fw-semibold text-primary mb-2">The Entertainment Guild collection</p>
+            <p className="eyebrow text-uppercase small fw-semibold mb-2">The Entertainment Guild collection</p>
             <h1 className="display-6 fw-bold mb-2" id="catalogue-heading">Find your next favourite.</h1>
-            <p className="lead text-secondary mb-0">Explore books, movies, and games in one place.</p>
+            <p className="lead text-body-secondary mb-0">Explore books, movies, and games in one place.</p>
           </div>
         </section>
 
         <div className="container py-4 py-lg-5">
           {/* Search box, category and format dropdowns, and clear button */}
-          <section className="catalogue-filters p-3 p-md-4 mb-4" aria-label="Search and filter catalogue">
+          <section className="panel p-3 p-md-4 mb-4" aria-label="Search and filter catalogue">
             <div className="row g-3 align-items-end">
               <div className="col-lg-6">
                 <label className="form-label fw-semibold" htmlFor="catalogue-search">Search the catalogue</label>

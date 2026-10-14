@@ -59,26 +59,17 @@ function HomePage() {
 
       <main>
         {/* Banner */}
-        <section className="catalogue-hero py-5">
+        <section className="page-banner py-5">
           <div className="container py-lg-4">
-            <div className="row align-items-center g-4">
-              <div className="col-lg-7">
-                <p className="text-uppercase small fw-semibold text-primary mb-2">Your entertainment shelf</p>
-                <h1 className="display-5 fw-bold">Find your next favourite story.</h1>
-                <p className="lead text-secondary mb-4">
-                  Browse books, movies, and games selected for curious minds and cosy weekends.
-                </p>
-                <a className="btn btn-primary btn-lg" href="#featured-items">
-                  See featured picks
-                </a>
-              </div>
-              <div className="col-lg-5">
-                <div className="hero-highlight p-4 rounded-3">
-                  <span className="badge text-bg-dark mb-3">Featured collection</span>
-                  <h2 className="h3">Something for every kind of escape.</h2>
-                  <p className="mb-0 text-secondary">Discover new worlds across three shelves of entertainment.</p>
-                </div>
-              </div>
+            <div className="col-lg-8">
+              <p className="eyebrow text-uppercase small fw-semibold mb-2">Your entertainment shelf</p>
+              <h1 className="display-5 fw-bold">Find your next favourite story.</h1>
+              <p className="lead text-body-secondary mb-4">
+                Browse books, movies, and games selected for curious minds and cosy weekends.
+              </p>
+              <a className="btn btn-guild btn-lg" href="#featured-items">
+                See featured picks
+              </a>
             </div>
           </div>
         </section>
@@ -86,7 +77,7 @@ function HomePage() {
         {/* Featured items section */}
         <section className="container py-5" id="featured-items" aria-labelledby="featured-heading">
           <div className="mb-4">
-            <p className="text-uppercase small fw-semibold text-primary mb-1">Hand-picked</p>
+            <p className="eyebrow text-uppercase small fw-semibold mb-1">Hand-picked</p>
             <h2 className="mb-0" id="featured-heading">A pick from every shelf</h2>
             <p className="text-muted mt-2 mb-0">One featured book, movie, and game from our catalogue.</p>
           </div>

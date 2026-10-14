@@ -52,13 +52,13 @@ function ProductDetailsPage() {
     }
 
     pageContent = (
-      <article className="product-details-card p-4 p-lg-5">
+      <article className="panel p-4 p-lg-5">
         <div className="row g-4 g-lg-5">
           {/* Left side has title, author and description */}
           <div className="col-lg-8">
-            <div className="d-flex flex-wrap gap-2 mb-3">
-              <span className="badge text-bg-primary">{item.category}</span>
-              <span className="badge text-bg-light">{item.subgenre}</span>
+            <div className="d-flex flex-wrap align-items-baseline gap-2 mb-3">
+              <span className={'category-label ' + item.category.toLowerCase()}>{item.category}</span>
+              <span className="text-muted small">{item.subgenre}</span>
             </div>
             <h1 className="display-6 fw-bold" id="product-heading">{item.title}</h1>
             <p className="lead text-muted">{item.creator}</p>
@@ -74,7 +74,7 @@ function ProductDetailsPage() {
 
           {/* Right side has format, price and stock */}
           <aside className="col-lg-4" aria-label="Item availability and price">
-            <div className="product-purchase-panel p-4">
+            <div className="price-box p-4">
               <p className="text-muted mb-1">Format</p>
               <p className="fw-semibold">{item.format}</p>
               <p className="display-6 fw-semibold mb-2">${item.price.toFixed(2)}</p>

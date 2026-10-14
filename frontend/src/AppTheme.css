@@ -1,41 +1,101 @@
-body {
-  background-color: #f8f9fa;
+/* Colours used across the whole site (so they only need changing in one place) */
+:root {
+  --guild-green: #23463f;
+  --guild-green-dark: #18322d;
+  --guild-rust: #9c462f;
+  --guild-cream: #faf6ef;
+  --guild-sand: #efe7d9;
+  --guild-border: #e2d9c8;
 }
 
+body {
+  background-color: var(--guild-cream);
+}
+
+/* Serif font for headings to give the site a bookshop feel */
+h1,
+h2,
+h3,
+.navbar-brand {
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+a {
+  color: var(--guild-green);
+}
+
+/* Makes the footer sit at the bottom of the screen on short pages */
 .app {
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-.catalogue-hero {
-  background: linear-gradient(135deg, #e8f1ff 0%, #fff8ed 100%);
+.site-navbar {
+  background-color: var(--guild-green);
+  /* Makes the grey nav links a bit brighter so they are easier to read on green */
+  --bs-navbar-color: rgba(255, 255, 255, 0.75);
 }
 
-.hero-highlight {
-  background-color: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(13, 110, 253, 0.15);
+/* Plain coloured strip at the top of the homepage and search page */
+.page-banner {
+  background-color: var(--guild-sand);
+  border-bottom: 1px solid var(--guild-border);
 }
 
-.catalogue-page-header {
-  background: linear-gradient(135deg, #e8f1ff 0%, #fff8ed 100%);
+/* Small uppercase label above headings */
+.eyebrow {
+  color: var(--guild-rust);
+  letter-spacing: 0.08em;
 }
 
-.catalogue-filters,
-.catalogue-empty {
+/* Buttons in the site colours (used instead of Bootstrap's blue ones) */
+.btn-guild {
+  background-color: var(--guild-green);
+  border-color: var(--guild-green);
+  color: #fff;
+}
+
+.btn-guild:hover {
+  background-color: var(--guild-green-dark);
+  border-color: var(--guild-green-dark);
+  color: #fff;
+}
+
+.btn-outline-guild {
+  border-color: var(--guild-green);
+  color: var(--guild-green);
+}
+
+.btn-outline-guild:hover {
+  background-color: var(--guild-green);
+  color: #fff;
+}
+
+/* White box with a thin border (filters, empty message, product details) */
+.panel {
   background-color: #fff;
-  border: 1px solid #e6eaf0;
-  border-radius: 1rem;
-  box-shadow: 0 0.5rem 1.5rem rgba(31, 45, 61, 0.06);
+  border: 1px solid var(--guild-border);
+  border-radius: 0.5rem;
 }
 
-.catalogue-result-count {
-  color: #526071;
+/* Item cards: green line along the top, border turns rust when hovered */
+.item-card {
+  border: 1px solid var(--guild-border);
+  border-top: 4px solid var(--guild-green);
+  border-radius: 0.5rem;
 }
 
-.product-details-card {
-  background-color: #fff;
-  border: 1px solid #e6eaf0;
-  border-radius: 1rem;
-  box-shadow: 0 0.5rem 1.5rem rgba(31, 45, 61, 0.06);
+.item-card:hover {
+  border-color: var(--guild-rust);
+}
+
+.category-label {
+  color: var(--guild-rust);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .product-description {
@@ -43,19 +103,25 @@ body {
   white-space: pre-line;
 }
 
-.product-purchase-panel {
-  background-color: #f8f9fa;
-  border: 1px solid #e6eaf0;
-  border-radius: 0.8rem;
+.price-box {
+  background-color: var(--guild-cream);
+  border: 1px solid var(--guild-border);
+  border-radius: 0.5rem;
 }
 
-.card.shadow-sm {
-  border: 1px solid #e6eaf0;
-  border-radius: 0.9rem;
-  transition: box-shadow 160ms ease, transform 160ms ease;
+.page-link {
+  color: var(--guild-green);
 }
 
-.card.shadow-sm:hover {
-  box-shadow: 0 0.75rem 1.75rem rgba(31, 45, 61, 0.12) !important;
-  transform: translateY(-2px);
+/* A different colour for each category label */
+.category-label.books {
+  color: var(--guild-rust);
+}
+
+.category-label.movies {
+  color: #6b4577;
+}
+
+.category-label.games {
+  color: #2d5a7b;
 }

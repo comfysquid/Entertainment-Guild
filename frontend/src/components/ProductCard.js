@@ -11,10 +11,11 @@ function ProductCard({ item }) {
   }
 
   return (
-    <article className="card h-100 shadow-sm">
+    <article className="card h-100 item-card">
       <div className="card-body d-flex flex-column">
         <div className="d-flex justify-content-between align-items-start gap-2 mb-3">
-          <span className="badge text-bg-light">{item.category}</span>
+          {/* e.g. 'category-label books' so each category gets its own colour */}
+          <span className={'category-label ' + item.category.toLowerCase()}>{item.category}</span>
           <span className={'small fw-semibold ' + stockColour}>{stockText}</span>
         </div>
         <h3 className="h5 card-title">{item.title}</h3>
@@ -23,7 +24,7 @@ function ProductCard({ item }) {
         {/* mt-auto pushes the price to the bottom so all the cards line up. */}
         <div className="mt-auto d-flex justify-content-between align-items-center">
           <span className="fs-5 fw-semibold">${item.price.toFixed(2)}</span>
-          <Link className="btn btn-outline-primary btn-sm" to={'/products/' + item.id}>
+          <Link className="btn btn-outline-guild btn-sm" to={'/products/' + item.id}>
             View details
           </Link>
         </div>

@@ -18,9 +18,10 @@ function Navbar() {
   }
 
   return (
-    <header className="navbar navbar-expand-lg navbar-dark bg-dark">
+    <header className="navbar navbar-expand-lg navbar-dark site-navbar">
       <div className="container">
         <Link className="navbar-brand fw-semibold" to="/">
+          <i className="bi bi-book-half me-2" aria-hidden="true" />
           Entertainment Guild
         </Link>
 
