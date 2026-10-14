@@ -1,5 +1,5 @@
 // AI-generated with GitHub Copilot (GPT-6 Luna).
-// Likely prompt: "Test that the homepage loads one featured book, movie, and game from mocked Axios detail endpoints."
+// Prompt: "Test that the homepage loads one featured book, movie, and game from mocked Axios detail endpoints."
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import axios from 'axios';
 import App from './App';

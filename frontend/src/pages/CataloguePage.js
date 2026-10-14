@@ -1,4 +1,3 @@
-// AI use: this file was simplified with help from Claude (Anthropic).
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import '../AppTheme.css';
@@ -12,7 +11,7 @@ const ITEMS_PER_PAGE = 12;
 const CATEGORIES = ['All', 'Books', 'Movies', 'Games'];
 
 function CataloguePage() {
-  // Lets us read and change the ?q=... part of the URL.
+  // Lets me read and change the ?q=... part of the URL.
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [allItems, setAllItems] = useState([]);
@@ -23,8 +22,7 @@ function CataloguePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Load the whole catalogue once when the page opens.
-  // After that, searching and filtering happens on this list (no more API calls).
+  // Load the whole catalogue once when the page opens then search/filter happens on this list (so no more API calls)
   useEffect(() => {
     async function loadCatalogue() {
       try {
@@ -39,7 +37,7 @@ function CataloguePage() {
     loadCatalogue();
   }, []);
 
-  // If the URL has ?q=something (e.g. from the navbar search), put it in the search box.
+  // If the URL has ?q=something put it in the search box.
   useEffect(() => {
     setSearchTerm(searchParams.get('q') || '');
     setCurrentPage(1);
@@ -55,7 +53,7 @@ function CataloguePage() {
   formats.sort();
   formats.unshift('All'); // put 'All' at the start of the list
 
-  // Keep only the items that match the search box and both dropdowns.
+  // Handles case-sensitive search & filtering by category & format
   const search = searchTerm.trim().toLowerCase();
   const filteredItems = allItems.filter((item) => {
     if (selectedCategory !== 'All' && item.category !== selectedCategory) {
@@ -64,12 +62,12 @@ function CataloguePage() {
     if (selectedFormat !== 'All' && item.format !== selectedFormat) {
       return false;
     }
-    // The search text can be found in the title, creator, category or format.
+    // Search title, creator, category, and format for search term (case-insensitive)
     const text = (item.title + ' ' + item.creator + ' ' + item.category + ' ' + item.format).toLowerCase();
     return text.includes(search);
   });
 
-  // Pagination: work out how many pages there are and which items are on this page.
+  // Handles pagination: how many pages, what items to show, Next/Previous buttons
   const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
   const start = (currentPage - 1) * ITEMS_PER_PAGE;
   const end = start + ITEMS_PER_PAGE;
@@ -91,8 +89,8 @@ function CataloguePage() {
     setSearchTerm(text);
     setCurrentPage(1);
 
-    // Also update the URL so the search can be bookmarked.
-    // { replace: true } stops every key press being added to the browser history.
+    // Update URL for bokmarking and sharing
+    // IMPORTANT: { replace: true } stops browser history fililng up with every keystroke
     if (text.trim() === '') {
       setSearchParams({}, { replace: true });
     } else {
@@ -108,9 +106,9 @@ function CataloguePage() {
     setCurrentPage(1);
   }
 
-  // Decide what to show under the filters: loading, error, "no results", or the item grid.
+  // if/else chain to show either loading, error, no results, or the catalogue grid 
   let results;
-  if (isLoading) {
+  if (isLoading) { // Show a loading message while the catalogue is being fetched
     results = <p className="text-muted py-4" role="status">Loading catalogue…</p>;
   } else if (error) {
     results = (
@@ -121,7 +119,7 @@ function CataloguePage() {
         </button>
       </div>
     );
-  } else if (filteredItems.length === 0) {
+  } else if (filteredItems.length === 0) { // No results found
     results = (
       <div className="catalogue-empty text-center py-5 px-3" role="status">
         <i className="bi bi-search display-5 text-muted" aria-hidden="true" />
@@ -130,7 +128,7 @@ function CataloguePage() {
         <button className="btn btn-outline-primary" onClick={clearFilters} type="button">Clear filters</button>
       </div>
     );
-  } else {
+  } else { // Catalogue grid with pagination
     results = (
       <>
         {/* Number of results and the current page */}

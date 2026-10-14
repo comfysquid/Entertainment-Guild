@@ -1,4 +1,3 @@
-// AI use: this file was simplified with help from Claude (Anthropic).
 import React, { useEffect, useState } from 'react';
 import '../AppTheme.css';
 import Footer from '../components/Footer';
@@ -26,9 +25,9 @@ function HomePage() {
     loadFeaturedItems();
   }, []);
 
-  // Work out what to show in the featured section: loading, error, the cards, or a message.
+  // if/else chain to show either loading, error, no results, or the featured items grid
   let featuredContent;
-  if (isLoading) {
+  if (isLoading) { // Show loading message while waiting for the API to respond
     featuredContent = <p className="text-muted" role="status">Loading catalogue…</p>;
   } else if (error) {
     featuredContent = (
@@ -40,7 +39,7 @@ function HomePage() {
         </button>
       </div>
     );
-  } else if (featuredItems.length > 0) {
+  } else if (featuredItems.length > 0) { // Show the three featured items in a grid
     featuredContent = (
       <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
         {featuredItems.map((item) => (
@@ -50,7 +49,7 @@ function HomePage() {
         ))}
       </div>
     );
-  } else {
+  } else { // No featured items available
     featuredContent = <div className="alert alert-info" role="status">There are no featured items available.</div>;
   }
 
@@ -59,7 +58,7 @@ function HomePage() {
       <Navbar />
 
       <main>
-        {/* Big banner at the top of the homepage */}
+        {/* Banner */}
         <section className="catalogue-hero py-5">
           <div className="container py-lg-4">
             <div className="row align-items-center g-4">

@@ -1,19 +1,18 @@
-// AI use: this file was simplified with help from Claude (Anthropic).
 import axios from 'axios';
 
-// The base address of the INFT3050 API running in Docker.
+// inft3050 api url
 const API_URL = 'http://localhost:3001/api/inft3050';
 
-// The Stocktake IDs of the items shown on the homepage (one book, one movie, one game).
+// stocktake IDs for homepage
 const FEATURED_ITEM_IDS = [31, 248, 457];
 
-// Gets a single row from a table, e.g. getRow('Product', 19).
+// Gets a single row from a table
 async function getRow(table, id) {
   const response = await axios.get(API_URL + '/' + table + '/' + id);
   return response.data;
 }
 
-// Gets every row from a table. The API only returns a few rows unless we ask for more.
+// Gets every row from a table. The API only returns a few rows unless we ask for more hence limit param
 async function getAllRows(table) {
   const response = await axios.get(API_URL + '/' + table, { params: { limit: 1000 } });
   return response.data.list;
@@ -22,7 +21,7 @@ async function getAllRows(table) {
 // The data for one item is spread across 4 tables:
 //   Stocktake = price and quantity, Product = title and author,
 //   Source = format (e.g. DVD), Genre = category (e.g. Books).
-// This function combines them into one simple object for the page to display.
+// makeItem combines into one object
 function makeItem(stockItem, product, source, genre) {
   // Some products have no genre, so put them under 'Other'.
   let category = 'Other';
@@ -41,7 +40,7 @@ function makeItem(stockItem, product, source, genre) {
   };
 }
 
-// Used by the search page: loads every item in the catalogue.
+// Used by the search page: loads all items in the catalogue.
 export async function fetchCatalogueItems() {
   const stockItems = await getAllRows('Stocktake');
   const products = await getAllRows('Product');
@@ -55,7 +54,7 @@ export async function fetchCatalogueItems() {
     const product = products.find((p) => p.ID === stockItem.ProductId);
     const source = sources.find((s) => s.sourceid === stockItem.SourceId);
 
-    // Skip any stock rows that point to a product or source that doesn't exist.
+    // Skip any stock rows that dont have a matching product or source
     if (!product || !source) {
       continue;
     }
@@ -67,7 +66,7 @@ export async function fetchCatalogueItems() {
   return items;
 }
 
-// Loads one item by its Stocktake ID.
+// Load 1 item by its Stocktake ID
 async function fetchItem(itemId) {
   const stockItem = await getRow('Stocktake', itemId);
   const product = await getRow('Product', stockItem.ProductId);
@@ -77,7 +76,7 @@ async function fetchItem(itemId) {
   return makeItem(stockItem, product, source, genre);
 }
 
-// Used by the homepage: loads only the three featured items.
+// For homepage: loads only the three featured items.
 export async function fetchFeaturedCatalogueItems() {
   const items = [];
 
@@ -116,7 +115,7 @@ export async function fetchCatalogueItemDetails(itemId) {
       const subgenre = await getRow(subgenreTable, product.subGenre);
       item.subgenre = subgenre.Name;
     } catch (error) {
-      // If the subgenre can't be found, just leave it as 'Not specified'.
+      // If no subgenre, leave as not specified
     }
   }
 

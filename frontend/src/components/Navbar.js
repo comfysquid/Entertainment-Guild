@@ -1,15 +1,13 @@
-// AI use: this file was simplified with help from Claude (Anthropic).
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-// The dark bar at the top of every page.
 function Navbar() {
   const navigate = useNavigate();
   const [searchText, setSearchText] = useState('');
 
   // When the search form is submitted, go to the search page with the text in the URL.
   function handleSearch(event) {
-    event.preventDefault(); // stop the browser reloading the page
+    event.preventDefault(); // stop the browser reloading the page!
 
     const text = searchText.trim();
     if (text === '') {
@@ -26,7 +24,7 @@ function Navbar() {
           Entertainment Guild
         </Link>
 
-        {/* Hamburger button that shows the menu on small screens (Bootstrap). */}
+        {/* Bootstrap hamburger button that shows the menu on small screens :) */}
         <button
           className="navbar-toggler"
           type="button"

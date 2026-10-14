@@ -1,7 +1,5 @@
-// AI use: this file was simplified with help from Claude (Anthropic).
 import React from 'react';
 
-// The footer at the bottom of every page.
 function Footer() {
   return (
     <footer className="border-top bg-white mt-auto">

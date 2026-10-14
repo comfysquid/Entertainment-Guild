@@ -1,8 +1,6 @@
-// AI use: this file was simplified with help from Claude (Anthropic).
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-// Shows one item as a card. Used on the homepage and the search page.
 function ProductCard({ item }) {
   // Green text if the item is in stock, red text if it isn't.
   let stockText = 'Out of stock';

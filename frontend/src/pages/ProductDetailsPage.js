@@ -1,4 +1,3 @@
-// AI use: this file was simplified with help from Claude (Anthropic).
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import '../AppTheme.css';
@@ -7,20 +6,20 @@ import Navbar from '../components/Navbar';
 import { fetchCatalogueItemDetails } from '../data/catalogue';
 
 function ProductDetailsPage() {
-  // Get the item ID from the URL, e.g. /products/31 gives itemId = '31'.
+  // Gets itemId from URL: e.g., /products/31 gives itemId = '31'
   const { itemId } = useParams();
 
   const [item, setItem] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Load the item whenever the ID in the URL changes.
+  // Load item details from API when page opens or URL changes
   useEffect(() => {
     async function loadItem() {
       setIsLoading(true);
       setError('');
       try {
-        const details = await fetchCatalogueItemDetails(itemId);
+        const details = await fetchCatalogueItemDetails(itemId); 
         setItem(details);
       } catch (err) {
         setError('We could not load this item. It may no longer be available.');
@@ -31,11 +30,11 @@ function ProductDetailsPage() {
     loadItem();
   }, [itemId]);
 
-  // Decide what to show: loading message, error message, or the item details.
+  // if/else chain to show either loading, error, or the item details
   let pageContent = null;
-  if (isLoading) {
+  if (isLoading) { // show loading message
     pageContent = <p className="text-muted" role="status">Loading item details…</p>;
-  } else if (error) {
+  } else if (error) { // show error message
     pageContent = (
       <div className="alert alert-danger" role="alert">
         <p className="mb-2">{error}</p>
@@ -44,8 +43,7 @@ function ProductDetailsPage() {
         </button>
       </div>
     );
-  } else if (item) {
-    // Text and colour for the stock line in the price box.
+  } else if (item) { // show the item details
     let stockText = 'Out of stock';
     let stockColour = 'text-danger';
     if (item.quantity > 0) {
@@ -56,7 +54,7 @@ function ProductDetailsPage() {
     pageContent = (
       <article className="product-details-card p-4 p-lg-5">
         <div className="row g-4 g-lg-5">
-          {/* Left side: title, author and description */}
+          {/* Left side has title, author and description */}
           <div className="col-lg-8">
             <div className="d-flex flex-wrap gap-2 mb-3">
               <span className="badge text-bg-primary">{item.category}</span>
@@ -66,7 +64,7 @@ function ProductDetailsPage() {
             <p className="lead text-muted">{item.creator}</p>
             <h2 className="h5 mt-4">About this item</h2>
             <p className="product-description">{item.description}</p>
-            {/* Only show the year if the product has a published date. */}
+            {/* Only shows year if product has a published date. */}
             {item.published && (
               <p className="text-muted mb-0">
                 Published: {new Date(item.published).getUTCFullYear()}
@@ -74,7 +72,7 @@ function ProductDetailsPage() {
             )}
           </div>
 
-          {/* Right side: format, price and stock */}
+          {/* Right side has format, price and stock */}
           <aside className="col-lg-4" aria-label="Item availability and price">
             <div className="product-purchase-panel p-4">
               <p className="text-muted mb-1">Format</p>
