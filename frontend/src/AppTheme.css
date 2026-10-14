@@ -1,4 +1,4 @@
-/* Colours used across the whole site (so they only need changing in one place) */
+/* Branded colours used across the whole site :) */
 :root {
   --guild-green: #23463f;
   --guild-green-dark: #18322d;
@@ -12,7 +12,6 @@ body {
   background-color: var(--guild-cream);
 }
 
-/* Serif font for headings to give the site a bookshop feel */
 h1,
 h2,
 h3,
@@ -24,7 +23,7 @@ a {
   color: var(--guild-green);
 }
 
-/* Makes the footer sit at the bottom of the screen on short pages */
+/* Makes footer sit at bottom of screen on short pages */
 .app {
   min-height: 100vh;
   display: flex;
@@ -33,23 +32,20 @@ a {
 
 .site-navbar {
   background-color: var(--guild-green);
-  /* Makes the grey nav links a bit brighter so they are easier to read on green */
   --bs-navbar-color: rgba(255, 255, 255, 0.75);
 }
 
-/* Plain coloured strip at the top of the homepage and search page */
 .page-banner {
   background-color: var(--guild-sand);
   border-bottom: 1px solid var(--guild-border);
 }
 
-/* Small uppercase label above headings */
+/* Small uppercase text above headings */
 .eyebrow {
   color: var(--guild-rust);
   letter-spacing: 0.08em;
 }
 
-/* Buttons in the site colours (used instead of Bootstrap's blue ones) */
 .btn-guild {
   background-color: var(--guild-green);
   border-color: var(--guild-green);
@@ -72,14 +68,14 @@ a {
   color: #fff;
 }
 
-/* White box with a thin border (filters, empty message, product details) */
+/* filters, empty message, product details */
 .panel {
   background-color: #fff;
   border: 1px solid var(--guild-border);
   border-radius: 0.5rem;
 }
 
-/* Item cards: green line along the top, border turns rust when hovered */
+/* Item cards: green line along the top, border turns brown when hovered */
 .item-card {
   border: 1px solid var(--guild-border);
   border-top: 4px solid var(--guild-green);
@@ -113,7 +109,7 @@ a {
   color: var(--guild-green);
 }
 
-/* A different colour for each category label */
+/* Unique colour for each category label */
 .category-label.books {
   color: var(--guild-rust);
 }
