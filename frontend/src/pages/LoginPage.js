@@ -1,0 +1,158 @@
+import React, { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import '../AppTheme.css';
+import Footer from '../components/Footer';
+import Navbar from '../components/Navbar';
+import { logIn } from '../data/auth';
+
+function LoginPage() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [isStaff, setIsStaff] = useState(false);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Customers log in with email, staff with a username
+  let usernameLabel = 'Email';
+  let usernameType = 'email';
+  if (isStaff) {
+    usernameLabel = 'Username';
+    usernameType = 'text';
+  }
+
+  async function handleSubmit(event) {
+    event.preventDefault(); // stop the browser reloading the page!
+
+    // Check the form before calling the API
+    if (username.trim() === '' || password === '') {
+      setError('Please enter your ' + usernameLabel.toLowerCase() + ' and password.');
+      return;
+    }
+
+    setError('');
+    setIsSubmitting(true);
+    try {
+      const user = await logIn(username.trim(), password, isStaff);
+
+      // Confirm who they're logged in as. Admins get told they're in Admin mode (Business Scenario 2).
+      let message = 'Welcome back, ' + user.name + '! You are now logged in.';
+      if (user.role === 'ADMIN') {
+        message = 'Logged in as ' + user.name + '. Admin mode is on, so purchasing is turned off for this account.';
+      } else if (user.role === 'STAFF') {
+        message = 'Logged in as ' + user.name + ' (staff). Purchasing is turned off for this account.';
+      }
+
+      // Go back to the page that sent them here (e.g. the cart), otherwise the home page
+      let nextPage = '/';
+      if (location.state && location.state.from && user.role === 'PATRON') {
+        nextPage = location.state.from;
+      }
+      navigate(nextPage, { state: { message: message } });
+    } catch (err) {
+      // 401 means wrong details, anything else means the server had a problem
+      if (err.response && err.response.status === 401) {
+        setError('That ' + usernameLabel.toLowerCase() + ' and password combination is incorrect.');
+      } else {
+        setError('We could not reach the server. Check that the API is running and try again.');
+      }
+      setPassword('');
+    }
+    setIsSubmitting(false);
+  }
+
+  function switchAccountType(staff) {
+    setIsStaff(staff);
+    setUsername('');
+    setPassword('');
+    setError('');
+  }
+
+  return (
+    <div className="app">
+      <Navbar />
+      <main className="container py-5" aria-labelledby="login-heading">
+        <div className="row justify-content-center">
+          <div className="col-md-8 col-lg-5">
+            <div className="panel p-4 p-lg-5">
+              <p className="eyebrow text-uppercase small fw-semibold mb-2">Welcome back</p>
+              <h1 className="h2 fw-bold mb-4" id="login-heading">Log in</h1>
+
+              {/* Bootstrap button group to pick customer or staff login */}
+              <div className="btn-group w-100 mb-4" role="group" aria-label="Account type">
+                <input
+                  checked={!isStaff}
+                  className="btn-check"
+                  id="type-customer"
+                  name="account-type"
+                  onChange={() => switchAccountType(false)}
+                  type="radio"
+                />
+                <label className="btn btn-outline-guild" htmlFor="type-customer">Customer</label>
+                <input
+                  checked={isStaff}
+                  className="btn-check"
+                  id="type-staff"
+                  name="account-type"
+                  onChange={() => switchAccountType(true)}
+                  type="radio"
+                />
+                <label className="btn btn-outline-guild" htmlFor="type-staff">Staff</label>
+              </div>
+
+              {error && (
+                <div className="alert alert-danger" role="alert">
+                  <i className="bi bi-exclamation-triangle me-1" aria-hidden="true" />
+                  {error}
+                </div>
+              )}
+
+              {/* noValidate so our own error messages show instead of the browser's */}
+              <form noValidate onSubmit={handleSubmit}>
+                <div className="mb-3">
+                  <label className="form-label fw-semibold" htmlFor="login-username">{usernameLabel}</label>
+                  <input
+                    autoComplete="username"
+                    className="form-control"
+                    id="login-username"
+                    onChange={(event) => setUsername(event.target.value)}
+                    type={usernameType}
+                    value={username}
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="form-label fw-semibold" htmlFor="login-password">Password</label>
+                  <input
+                    autoComplete="current-password"
+                    className="form-control"
+                    id="login-password"
+                    onChange={(event) => setPassword(event.target.value)}
+                    type="password"
+                    value={password}
+                  />
+                </div>
+                <button className="btn btn-guild w-100" disabled={isSubmitting} type="submit">
+                  {isSubmitting ? 'Logging in…' : 'Log in'}
+                </button>
+              </form>
+
+              {/* Staff accounts are created by an admin, so only customers see these links */}
+              {!isStaff && (
+                <div className="mt-4 small text-center">
+                  <p className="mb-1">
+                    New customer? <Link to="/register">Create an account</Link>
+                  </p>
+                  <p className="text-muted mb-0">Forgotten your password? Account recovery is coming soon.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
+export default LoginPage;

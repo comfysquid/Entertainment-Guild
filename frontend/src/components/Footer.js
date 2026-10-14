@@ -15,11 +15,7 @@ function Footer() {
           </a>
           <a className="text-muted" href="/search">
             Browse items
-          </a>
-          <a className="text-muted" href="/account">
-            Account
-          </a>
-        </nav>
+          </a>        </nav>
       </div>
       <div className="container pb-3">
         <small className="text-muted">&copy; {new Date().getFullYear()} Entertainment Guild</small>

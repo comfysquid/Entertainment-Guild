@@ -11,14 +11,14 @@ const ITEMS_PER_PAGE = 12;
 const CATEGORIES = ['All', 'Books', 'Movies', 'Games'];
 
 function CataloguePage() {
-  // Lets me read and change the ?q=... part of the URL.
+  // The search, filters and page number are all kept in the URL, e.g. /search?q=star&category=Games&page=2
   const [searchParams, setSearchParams] = useSearchParams();
+  const searchTerm = searchParams.get('q') || '';
+  const selectedCategory = searchParams.get('category') || 'All';
+  const selectedFormat = searchParams.get('format') || 'All';
+  const currentPage = Number(searchParams.get('page')) || 1;
 
   const [allItems, setAllItems] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [selectedFormat, setSelectedFormat] = useState('All');
-  const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -37,12 +37,6 @@ function CataloguePage() {
     loadCatalogue();
   }, []);
 
-  // If the URL has ?q=something put it in the search box.
-  useEffect(() => {
-    setSearchTerm(searchParams.get('q') || '');
-    setCurrentPage(1);
-  }, [searchParams]);
-
   // Make the list of formats for the dropdown from the items we loaded.
   const formats = [];
   for (const item of allItems) {
@@ -53,7 +47,7 @@ function CataloguePage() {
   formats.sort();
   formats.unshift('All'); // put 'All' at the start of the list
 
-  // Handles case-sensitive search & filtering by category & format
+  // Handles case-insensitive search & filtering by category & format
   const search = searchTerm.trim().toLowerCase();
   const filteredItems = allItems.filter((item) => {
     if (selectedCategory !== 'All' && item.category !== selectedCategory) {
@@ -73,37 +67,38 @@ function CataloguePage() {
   const end = start + ITEMS_PER_PAGE;
   const itemsOnThisPage = filteredItems.slice(start, end);
 
-  // Whenever a filter changes, go back to page 1.
+  // Updates the URL with the changed values. Default values (All, page 1, empty search) are left out.
+  // IMPORTANT: { replace: true } stops browser history filling up with every keystroke
+  function updateUrl(changes) {
+    const values = { q: searchTerm, category: selectedCategory, format: selectedFormat, page: 1, ...changes };
+    const params = {};
+    if (values.q.trim() !== '') params.q = values.q;
+    if (values.category !== 'All') params.category = values.category;
+    if (values.format !== 'All') params.format = values.format;
+    if (values.page > 1) params.page = values.page;
+    setSearchParams(params, { replace: true });
+  }
+
+  // Changing the search or a filter goes back to page 1 (updateUrl defaults page to 1).
   function handleCategoryChange(event) {
-    setSelectedCategory(event.target.value);
-    setCurrentPage(1);
+    updateUrl({ category: event.target.value });
   }
 
   function handleFormatChange(event) {
-    setSelectedFormat(event.target.value);
-    setCurrentPage(1);
+    updateUrl({ format: event.target.value });
   }
 
   function handleSearchChange(event) {
-    const text = event.target.value;
-    setSearchTerm(text);
-    setCurrentPage(1);
+    updateUrl({ q: event.target.value });
+  }
 
-    // Update URL for bokmarking and sharing
-    // IMPORTANT: { replace: true } stops browser history fililng up with every keystroke
-    if (text.trim() === '') {
-      setSearchParams({}, { replace: true });
-    } else {
-      setSearchParams({ q: text.trim() }, { replace: true });
-    }
+  function goToPage(page) {
+    updateUrl({ page: page });
+    window.scrollTo(0, 0);
   }
 
   function clearFilters() {
-    setSearchTerm('');
     setSearchParams({});
-    setSelectedCategory('All');
-    setSelectedFormat('All');
-    setCurrentPage(1);
   }
 
   // if/else chain to show either loading, error, no results, or the catalogue grid 
@@ -156,7 +151,7 @@ function CataloguePage() {
                 <button
                   className="page-link"
                   disabled={currentPage === 1}
-                  onClick={() => setCurrentPage(currentPage - 1)}
+                  onClick={() => goToPage(currentPage - 1)}
                   type="button"
                 >
                   Previous
@@ -169,7 +164,7 @@ function CataloguePage() {
                 <button
                   className="page-link"
                   disabled={currentPage === totalPages}
-                  onClick={() => setCurrentPage(currentPage + 1)}
+                  onClick={() => goToPage(currentPage + 1)}
                   type="button"
                 >
                   Next

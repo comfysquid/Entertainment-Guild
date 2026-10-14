@@ -58,6 +58,14 @@ a {
   color: #fff;
 }
 
+/* Greyed out green for buttons that can't be used yet (e.g. Checkout) */
+.btn-guild:disabled {
+  background-color: var(--guild-green);
+  border-color: var(--guild-green);
+  color: #fff;
+  opacity: 0.5;
+}
+
 .btn-outline-guild {
   border-color: var(--guild-green);
   color: var(--guild-green);
@@ -107,6 +115,48 @@ a {
 
 .page-link {
   color: var(--guild-green);
+}
+
+/* "Admin mode" / "Staff" label next to the user's name */
+.role-badge {
+  background-color: var(--guild-sand);
+  color: var(--guild-green-dark);
+}
+
+/* Message under the navbar, e.g. after logging in */
+.navbar-message {
+  font-size: 0.95rem;
+}
+
+/* "Back to results" button made to look like the other links */
+.back-link {
+  color: var(--guild-green);
+}
+
+/* Number of items next to Cart in the navbar */
+.cart-badge {
+  background-color: var(--guild-rust);
+}
+
+/* Line between each item in the cart */
+.cart-line + .cart-line {
+  border-top: 1px solid var(--guild-border);
+}
+
+.cart-qty {
+  width: 5rem;
+}
+
+.cart-line-total {
+  min-width: 5rem;
+  text-align: right;
+}
+
+/* Selected Customer/Staff button on the login page */
+.btn-check:checked + .btn-outline-guild {
+  background-color: var(--guild-green);
+  border-color: var(--guild-green);
+  color: #fff;
 }
 
 /* Unique colour for each category label */

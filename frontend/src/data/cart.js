@@ -1,0 +1,69 @@
+// Save cart in localStorage (doesn't disappear on refresh)
+const CART_KEY = 'eg-cart';
+
+// Returns cart as an array { id, title, format, price, stock, quantity }
+export function getCart() {
+  try {
+    const saved = localStorage.getItem(CART_KEY);
+    if (saved) {
+      return JSON.parse(saved);
+    }
+  } catch (error) {
+  }
+  return []; // Broken storage counts as empty cart
+}
+
+// Saves cart and updates navbar cart count
+function saveCart(cart) {
+  try {
+    localStorage.setItem(CART_KEY, JSON.stringify(cart));
+  } catch (error) {
+  }
+  window.dispatchEvent(new Event('cart-updated'));
+}
+
+// Adds an item or quantiy (if in cart) and saves the cart.
+export function addToCart(item, quantity) {
+  const cart = getCart();
+  const existing = cart.find((line) => line.id === item.id);
+
+  if (existing) {
+    existing.quantity = Math.min(existing.quantity + quantity, item.quantity);  // Don't allow more than stock
+    existing.stock = item.quantity;
+    existing.price = item.price;
+  } else {
+    cart.push({
+      id: item.id,
+      title: item.title,
+      format: item.format,
+      price: item.price,
+      stock: item.quantity,
+      quantity: Math.min(quantity, item.quantity),
+    });
+  }
+
+  saveCart(cart);
+}
+
+export function updateQuantity(itemId, quantity) {
+  const cart = getCart();
+  const line = cart.find((l) => l.id === itemId);
+  if (line) {
+    line.quantity = quantity;
+    saveCart(cart);
+  }
+}
+
+export function removeFromCart(itemId) {
+  const cart = getCart().filter((line) => line.id !== itemId);
+  saveCart(cart);
+}
+
+// Total number of items for the navbar cart count
+export function getCartCount() {
+  let count = 0;
+  for (const line of getCart()) {
+    count += line.quantity;
+  }
+  return count;
+}

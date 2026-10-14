@@ -1,0 +1,177 @@
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import '../AppTheme.css';
+import Footer from '../components/Footer';
+import Navbar from '../components/Navbar';
+
+// Address dropdown 
+const STATES = [
+  { code: 'ACT', name: 'Australian Capital Territory' },
+  { code: 'NSW', name: 'New South Wales' },
+  { code: 'NT', name: 'Northern Territory' },
+  { code: 'QLD', name: 'Queensland' },
+  { code: 'SA', name: 'South Australia' },
+  { code: 'TAS', name: 'Tasmania' },
+  { code: 'VIC', name: 'Victoria' },
+  { code: 'WA', name: 'Western Australia' },
+];
+
+// Empty object for form used to reset on pageload/after submission
+const EMPTY_FORM = {
+  name: '',
+  email: '',
+  password: '',
+  confirmPassword: '',
+  phone: '',
+  street: '',
+  suburb: '',
+  state: '',
+  postcode: '',
+};
+
+// Form validation logic, returns object with error messages for each field that fails
+function validate(form) {
+  const errors = {};
+
+  if (form.name.trim() === '') {
+    errors.name = 'Enter your name.';
+  }
+  // Something@something.something
+  if (!/^\S+@\S+\.\S+$/.test(form.email.trim())) {
+    errors.email = 'Enter a valid email address.';
+  }
+  if (form.password.length < 8) {
+    errors.password = 'Password must be at least 8 characters.';
+  }
+  if (form.confirmPassword !== form.password) {
+    errors.confirmPassword = 'Passwords do not match.';
+  }
+  // Phone is optional, but if given it must be an Australian number e.g. 0412345678
+  const phone = form.phone.replace(/\s/g, '');
+  if (phone !== '' && !/^0\d{9}$/.test(phone)) { // must be 10 digits starting with 0
+    errors.phone = 'Enter a 10 digit Australian number starting with 0.';
+  }
+  // Business Scenario 4: an address has both a number and a street name e.g. 377 Ring Road
+  if (form.street.trim() === '') {
+    errors.street = 'Enter your street address.';
+  } else if (!/\d/.test(form.street) || !/[a-zA-Z]/.test(form.street)) { // Must have at least one number and one letter
+    errors.street = 'Street address needs a number and a street name, e.g. 377 Ring Road.';
+  }
+  if (form.suburb.trim() === '') {
+    errors.suburb = 'Enter your suburb.';
+  }
+  if (form.state === '') {
+    errors.state = 'Choose your state.';
+  }
+  if (!/^\d{4}$/.test(form.postcode.trim())) { // must be 4 digits
+    errors.postcode = 'Postcode must be 4 numbers, e.g. 2308.';
+  }
+
+  return errors;
+}
+
+function RegisterPage() {
+  const [form, setForm] = useState(EMPTY_FORM);
+  const [errors, setErrors] = useState({});
+  const [isValid, setIsValid] = useState(false);
+
+  // Uses the input's id to know which field to update
+  function handleChange(event) {
+    setForm({ ...form, [event.target.id]: event.target.value });
+    setIsValid(false);
+  }
+
+  function handleSubmit(event) {
+    event.preventDefault(); // stop the browser reloading the page!
+    const newErrors = validate(form);
+    setErrors(newErrors);
+    setIsValid(Object.keys(newErrors).length === 0);
+  }
+
+  // Returns label + input + error message for a field. Uses input's id to know which field to update/error message to show
+  function field(id, label, type = 'text', extra = {}) {
+    return (
+      <>
+        <label className="form-label fw-semibold" htmlFor={id}>{label}</label>
+        <input
+          aria-describedby={errors[id] ? id + '-error' : undefined}
+          className={errors[id] ? 'form-control is-invalid' : 'form-control'}
+          id={id}
+          onChange={handleChange}
+          type={type}
+          value={form[id]}
+          {...extra}
+        />
+        {errors[id] && <div className="invalid-feedback" id={id + '-error'}>{errors[id]}</div>}
+      </>
+    );
+  }
+
+  return (
+    <div className="app">
+      <Navbar />
+      <main className="container py-5" aria-labelledby="register-heading">
+        <div className="row justify-content-center">
+          <div className="col-lg-8">
+            <div className="panel p-4 p-lg-5">
+              <p className="eyebrow text-uppercase small fw-semibold mb-2">Join the Guild</p>
+              <h1 className="h2 fw-bold mb-2" id="register-heading">Create an account</h1>
+              <p className="text-muted mb-4">
+                Already have one? <Link to="/login">Log in</Link>
+              </p>
+
+              {isValid && (
+                <div className="alert alert-info" role="status">
+                  <i className="bi bi-info-circle me-1" aria-hidden="true" />
+                  Not implemented yet!.
+                </div>
+              )}
+
+              <form noValidate onSubmit={handleSubmit}>
+                <h2 className="h5 mb-3">Your details</h2>
+                <div className="row g-3 mb-4">
+                  <div className="col-md-6">{field('name', 'Full name', 'text', { autoComplete: 'name' })}</div>
+                  <div className="col-md-6">{field('email', 'Email', 'email', { autoComplete: 'email' })}</div>
+                  <div className="col-md-6">{field('password', 'Password', 'password', { autoComplete: 'new-password' })}</div>
+                  <div className="col-md-6">
+                    {field('confirmPassword', 'Confirm password', 'password', { autoComplete: 'new-password' })}
+                  </div>
+                  <div className="col-md-6">{field('phone', 'Phone (optional)', 'tel', { autoComplete: 'tel' })}</div>
+                </div>
+
+                <h2 className="h5 mb-3">Delivery address</h2>
+                <div className="row g-3 mb-4">
+                  <div className="col-12">{field('street', 'Street address', 'text', { autoComplete: 'street-address', placeholder: 'e.g. 377 Ring Road' })}</div>
+                  <div className="col-md-5">{field('suburb', 'Suburb')}</div>
+                  <div className="col-md-4">
+                    <label className="form-label fw-semibold" htmlFor="state">State</label>
+                    <select
+                      className={errors.state ? 'form-select is-invalid' : 'form-select'}
+                      id="state"
+                      onChange={handleChange}
+                      value={form.state}
+                    >
+                      <option value="">Choose…</option>
+                      {STATES.map((state) => (
+                        <option key={state.code} value={state.code}>{state.name} ({state.code})</option>
+                      ))}
+                    </select>
+                    {errors.state && <div className="invalid-feedback">{errors.state}</div>}
+                  </div>
+                  <div className="col-md-3">
+                    {field('postcode', 'Postcode', 'text', { inputMode: 'numeric', maxLength: 4, placeholder: 'e.g. 2308' })}
+                  </div>
+                </div>
+
+                <button className="btn btn-guild" type="submit">Create account</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
+export default RegisterPage;
