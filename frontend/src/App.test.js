@@ -99,6 +99,8 @@ test('search page filters items and paginates results', async () => {
   expect(screen.getByText('Catalogue item 13')).toBeInTheDocument();
 });
 
+// AI-generated with Claude Code: the tests below (cart, login, register, admin mode, URL filters).
+// Prompt: "Review existing Jest and React Testing Library tests and add tests for the cart and login pages I revised."
 test('adds an item to the cart and limits quantity to the stock available', async () => {
   const apiRows = {
     '/Stocktake/31': { ItemId: 31, ProductId: 1, SourceId: 1, Quantity: 2, Price: 10 },

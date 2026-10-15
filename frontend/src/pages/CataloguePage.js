@@ -1,3 +1,8 @@
+// AI-assisted (Claude Code): simplified/refactored, then reviewed and re-commented by me.
+// Prompt: "Review my largest React pages and simplify the code where possible without changing too much
+//   functionality or the appearance/styling of the app. Keep the changes focused and explain what you changed,
+//   where, and why."
+
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import '../AppTheme.css';
@@ -11,6 +16,7 @@ const ITEMS_PER_PAGE = 12;
 const CATEGORIES = ['All', 'Books', 'Movies', 'Games'];
 
 function CataloguePage() {
+  // AI-assisted (Claude Code): search/filters/page kept in the URL for Business Scenario 1.
   // The search, filters and page number are all kept in the URL, e.g. /search?q=star&category=Games&page=2
   const [searchParams, setSearchParams] = useSearchParams();
   const searchTerm = searchParams.get('q') || '';
@@ -47,6 +53,10 @@ function CataloguePage() {
   formats.sort();
   formats.unshift('All'); // put 'All' at the start of the list
 
+  // Filtering + pagination concept explained with ChatGPT (explanation only, not code).
+  // Prompt: "Explain React filtering and pagination in one short paragraph, focusing on combining multiple filters,
+  //   updating results when filters change, and resetting pagination to page 1. Focus mostly on the coding aspect
+  //   and how it works in development (as a dev). Use a simple analogy."
   // Handles case-insensitive search & filtering by category & format
   const search = searchTerm.trim().toLowerCase();
   const filteredItems = allItems.filter((item) => {

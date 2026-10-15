@@ -1,3 +1,8 @@
+// AI-assisted (Claude Code): simplified/refactored, then reviewed and re-commented by me.
+// Prompt: "Review my largest React pages and simplify the code where possible without changing too much
+//   functionality or the appearance/styling of the app. Keep the changes focused and explain what you changed,
+//   where, and why."
+
 import axios from 'axios';
 
 // inft3050 api url

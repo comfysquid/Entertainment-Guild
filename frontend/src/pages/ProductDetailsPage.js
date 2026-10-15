@@ -37,6 +37,8 @@ function ProductDetailsPage() {
     loadItem();
   }, [itemId]);
 
+  // AI-assisted (Claude Code): add to cart, Continue shopping and Back to results.
+  // Prompt: "Draft the cart page using my existing React components, the supplied wireframes, and documented API routes."
   // Goes back to search results customer came from, retains search/filters
   function backToResults() {
     if (window.history.state && window.history.state.idx > 0) {

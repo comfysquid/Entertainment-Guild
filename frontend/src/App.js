@@ -18,7 +18,6 @@ function App() {
         <Route path="/cart" element={<CartPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        {/* Any other URL shows this message */}
         <Route path="*" element={<main className="container py-5"><h1>Page not found</h1></main>} />
       </Routes>
     </BrowserRouter>
