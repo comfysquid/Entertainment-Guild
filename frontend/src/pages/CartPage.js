@@ -123,8 +123,8 @@ function CartPage() {
             {/* Must login before checkout */}
             {user ? (
               <>
-                <button className="btn btn-guild w-100" disabled type="button">Checkout</button>
-                <p className="small text-muted mt-2 mb-0">Checkout and payment are coming in the next sprint.</p>
+                <Link className="btn btn-guild w-100" to="/checkout">Checkout</Link>
+                <p className="small text-muted mt-2 mb-0">You'll confirm your delivery address and pay on the next page.</p>
               </>
             ) : (
               <>

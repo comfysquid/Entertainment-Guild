@@ -146,8 +146,15 @@ function LoginPage() {
                   <p className="mb-1">
                     New customer? <Link to="/register">Create an account</Link>
                   </p>
-                  <p className="text-muted mb-0">Forgotten your password? Account recovery is coming soon.</p>
+                  <p className="mb-0">
+                    Forgotten your password? <Link to="/forgot-password">Recover your account</Link>
+                  </p>
                 </div>
+              )}
+              {isStaff && (
+                <p className="mt-4 mb-0 small text-muted text-center">
+                  Forgotten your staff password? Ask an administrator to reset your account.
+                </p>
               )}
             </div>
           </div>

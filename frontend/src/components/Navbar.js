@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { getCurrentUser, isStaffUser, logOut } from '../data/auth';
 import { getCartCount } from '../data/cart';
 
@@ -53,6 +53,7 @@ function Navbar() {
 
   // Conditional rendering to only show cart link for non-staff
   const showCart = !isStaffUser(user);
+  const showStaffLinks = isStaffUser(user);
 
   let roleBadge = '';
   if (user && user.role === 'ADMIN') {
@@ -63,7 +64,7 @@ function Navbar() {
 
   return (
     <>
-      <header className="navbar navbar-expand-lg navbar-dark site-navbar">
+      <header className="navbar navbar-expand-xl navbar-dark site-navbar">
         <div className="container">
           <Link className="navbar-brand fw-semibold" to="/">
             <i className="bi bi-book-half me-2" aria-hidden="true" />
@@ -84,16 +85,16 @@ function Navbar() {
           </button>
 
           <div className="collapse navbar-collapse" id="main-navigation">
-            {/* Page links */}
+            {/* Page links. NavLink marks the link for the current page as active */}
             <nav className="navbar-nav me-auto" aria-label="Primary navigation">
-              <Link className="nav-link active" aria-current="page" to="/">
+              <NavLink className="nav-link" end to="/">
                 Home
-              </Link>
-              <Link className="nav-link" to="/search">
+              </NavLink>
+              <NavLink className="nav-link" to="/search">
                 Browse items
-              </Link>
+              </NavLink>
               {showCart && (
-                <Link className="nav-link" to="/cart">
+                <NavLink className="nav-link" to="/cart">
                   Cart
                   {/* Badge only shows once something is in the cart */}
                   {cartCount > 0 && (
@@ -102,7 +103,23 @@ function Navbar() {
                       <span className="visually-hidden"> items in cart</span>
                     </span>
                   )}
-                </Link>
+                </NavLink>
+              )}
+              {user && user.role === 'PATRON' && (
+                <NavLink className="nav-link" to="/account">
+                  My account
+                </NavLink>
+              )}
+              {/* Staff can view items and accounts, admins can also change them */}
+              {showStaffLinks && (
+                <>
+                  <NavLink className="nav-link" to="/admin/items" title="Add, edit and delete items">
+                    Manage items
+                  </NavLink>
+                  <NavLink className="nav-link" to="/admin/users" title="Staff, admin and customer accounts">
+                    {user.role === 'ADMIN' ? 'Manage users' : 'View accounts'}
+                  </NavLink>
+                </>
               )}
             </nav>
 
@@ -127,7 +144,7 @@ function Navbar() {
 
             {/* Shows the user's name and a log out button, or a log in link */}
             {user ? (
-              <div className="d-flex align-items-center ms-lg-3 mt-2 mt-lg-0">
+              <div className="d-flex align-items-center text-nowrap ms-xl-3 mt-2 mt-xl-0">
                 {roleBadge && <span className="badge role-badge me-2">{roleBadge}</span>}
                 <span className="text-light me-2">
                   <i className="bi bi-person me-1" aria-hidden="true" />
@@ -138,7 +155,7 @@ function Navbar() {
                 </button>
               </div>
             ) : (
-              <Link className="nav-link text-light ms-lg-3" to="/login">
+              <Link className="nav-link text-light ms-xl-3" to="/login">
                 <i className="bi bi-person me-1" aria-hidden="true" />
                 Log in
               </Link>

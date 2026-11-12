@@ -71,8 +71,8 @@ export async function fetchCatalogueItems() {
   return items;
 }
 
-// Load 1 item by its Stocktake ID
-async function fetchItem(itemId) {
+// Load 1 item by its Stocktake ID (also used for the items in an order)
+export async function fetchItem(itemId) {
   const stockItem = await getRow('Stocktake', itemId);
   const product = await getRow('Product', stockItem.ProductId);
   const source = await getRow('Source', stockItem.SourceId);

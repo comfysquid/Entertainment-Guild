@@ -70,3 +70,8 @@ export function getCartCount() {
   }
   return count;
 }
+
+// Empties the cart after an order is placed
+export function clearCart() {
+  saveCart([]);
+}
